@@ -52,24 +52,17 @@ dbt (adaptateur SQLite)
 Étapes
 Ingestion des données :
 
-Bash
-
 python ingest.py
 Exécution du pipeline dbt :
 Accédez au dossier du pipeline et exécutez les transformations :
-
-Bash
 
 cd playstore_pipeline
 dbt run
 Vérification de la qualité :
 
-Bash
-
 dbt test
 Exportation :
 
-Bash
 
 python export_to_powerbi.py
 📊 Visualisation
