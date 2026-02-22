@@ -7,7 +7,7 @@ This document explains the end-to-end flow of the data pipeline, from raw data s
 The project is structured into three main phases: Ingestion, Transformation (dbt), and Export.
 
 ```text
-c:\Users\bellm\Desktop\lab 2\
+lab 2\
 │
 ├── ingest.py                           # 1. Data Ingestion script
 ├── export_to_powerbi.py                # 3. Data Export script
