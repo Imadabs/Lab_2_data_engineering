@@ -1,7 +1,7 @@
 ```text
 Playstore Data Pipeline (Lab 2)
 Ce projet implémente un pipeline de données complet pour collecter, transformer et exporter des données provenant du Google Play Store. Le projet utilise Python pour l'ingestion et l'exportation, SQLite comme base de données locale, et dbt pour la transformation des données.
-+4
+
 
 📂 Structure du Projet
 Plaintext
@@ -24,7 +24,6 @@ lab 2/
 🚀 Fonctionnalités
 
 Ingestion : Le script ingest.py charge les fichiers JSONL bruts (apps.jsonl, reviews.jsonl) dans une base de données SQLite locale nommée playstore.db.
-+1
 
 Transformation (dbt) : Utilisation de modèles SQL pour organiser les données en dimensions et faits :
 
@@ -36,11 +35,11 @@ dim_date : Table de temps pour les analyses chronologiques.
 
 
 dim_developers : Informations sur les développeurs d'applications.
-+2
+
 
 
 Qualité des données : Des tests unique et not_null sont configurés pour garantir l'intégrité des clés primaires (ex: category_sk, date_key, developer_id).
-+2
+
 
 Export : Le script export_to_powerbi.py permet de préparer les données pour une visualisation externe.
 
