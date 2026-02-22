@@ -1,3 +1,4 @@
+```text
 Playstore Data Pipeline (Lab 2)
 Ce projet implémente un pipeline de données complet pour collecter, transformer et exporter des données provenant du Google Play Store. Le projet utilise Python pour l'ingestion et l'exportation, SQLite comme base de données locale, et dbt pour la transformation des données.
 +4
