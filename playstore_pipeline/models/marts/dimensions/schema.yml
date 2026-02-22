@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: dim_categories
+    description: "Unique app categories/genres from Google Play Store."
+    columns:
+      - name: category_sk
+        description: "Surrogate key (md5 of category_id)."
+        tests:
+          - unique
+          - not_null
+      - name: category_id
+        description: "Natural key — Play Store genre ID."
+        tests:
+          - unique
+          - not_null
+      - name: category_name
+        description: "Human-readable genre/category name."
+
+  - name: dim_developers
+    description: "Unique app developers from Google Play Store."
+    columns:
+      - name: developer_sk
+        description: "Surrogate key (md5 of developer_id)."
+        tests:
+          - unique
+          - not_null
+      - name: developer_id
+        description: "Natural key — Play Store developer ID."
+        tests:
+          - unique
+          - not_null
+      - name: developer_name
+        description: "Developer display name."
+
+  - name: dim_apps
+    description: "App dimension enriched with category and developer FKs."
+    columns:
+      - name: app_sk
+        description: "Surrogate key for the app."
+        tests:
+          - unique
+          - not_null
+      - name: app_id
+        description: "Natural key — Play Store package name."
+        tests:
+          - unique
+          - not_null
+      - name: category_sk
+        description: "Foreign key to dim_categories."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_categories')
+              field: category_sk
+      - name: developer_sk
+        description: "Foreign key to dim_developers."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_developers')
+              field: developer_sk
+      - name: app_name
+        description: "App display title."
+      - name: price
+        description: "App price in USD."
+      - name: avg_score
+        description: "Average user rating."
+      - name: total_ratings
+        description: "Total number of user ratings."
+
+  - name: dim_date
+    description: "Continuous date dimension spanning the review date range."
+    columns:
+      - name: date_key
+        description: "Integer primary key in YYYYMMDD format."
+        tests:
+          - unique
+          - not_null
+      - name: date_day
+        description: "Calendar date."
+      - name: year
+        description: "Four-digit year."
+      - name: quarter
+        description: "Quarter number (1-4)."
+      - name: month
+        description: "Month number (1-12)."
+      - name: month_name
+        description: "Full month name."
+      - name: week_of_year
+        description: "ISO week number."
+      - name: day_of_week
+        description: "Day of week (0=Sunday, 6=Saturday)."
+      - name: day_name
+        description: "Full day name."
+      - name: is_weekend
+        description: "True if the date falls on a Saturday or Sunday."

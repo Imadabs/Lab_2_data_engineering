@@ -1,0 +1,60 @@
+version: 2
+
+models:
+  - name: stg_playstore_apps
+    description: "Staged app metadata from Google Play Store."
+    columns:
+      - name: app_sk
+        description: "Surrogate key for the app (md5 of app_id)."
+        tests:
+          - unique
+          - not_null
+      - name: app_id
+        description: "Natural key — Google Play app package name."
+        tests:
+          - unique
+          - not_null
+      - name: app_name
+        description: "Display title of the app."
+      - name: developer_name
+        description: "Developer display name."
+      - name: developer_id
+        description: "Developer identifier."
+      - name: category_name
+        description: "App genre/category label."
+      - name: category_id
+        description: "App genre/category identifier."
+      - name: avg_score
+        description: "Average user rating (0–5)."
+      - name: total_ratings
+        description: "Total number of ratings."
+      - name: price
+        description: "App price in USD."
+
+  - name: stg_playstore_reviews
+    description: "Staged user reviews from Google Play Store."
+    columns:
+      - name: review_sk
+        description: "Surrogate key for the review (md5 of review_id)."
+        tests:
+          - unique
+          - not_null
+      - name: review_id
+        description: "Natural key — Google Play review identifier."
+        tests:
+          - unique
+          - not_null
+      - name: app_id
+        description: "Foreign reference to the reviewed app."
+        tests:
+          - not_null
+      - name: user_name
+        description: "Display name of the reviewer."
+      - name: review_score
+        description: "User rating (1–5)."
+      - name: review_text
+        description: "Review body text."
+      - name: review_at
+        description: "Timestamp when the review was posted."
+      - name: thumbs_up_count
+        description: "Number of helpful votes on the review."

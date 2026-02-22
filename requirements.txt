@@ -1,0 +1,15 @@
+# Lab 2 — Google Play Store Data Pipeline
+# Install all dependencies with: pip install -r requirements.txt
+
+# Data ingestion
+google-play-scraper
+
+# Database
+duckdb==1.4.4
+
+# dbt Core + DuckDB adapter
+dbt-core==1.11.6
+dbt-duckdb==1.10.1
+
+# Date and time utilities
+python-dateutil==2.9.0.post0

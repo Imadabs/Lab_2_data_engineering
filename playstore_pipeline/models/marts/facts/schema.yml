@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: fact_reviews
+    description: "Fact table at review grain — one row per user review per app."
+    columns:
+      - name: review_sk
+        description: "Surrogate key (primary key) for the review."
+        tests:
+          - unique
+          - not_null
+      - name: review_id
+        description: "Natural key — Play Store review ID."
+      - name: app_sk
+        description: "Foreign key to dim_apps."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_apps')
+              field: app_sk
+      - name: date_key
+        description: "Foreign key to dim_date (YYYYMMDD integer)."
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_date')
+              field: date_key
+      - name: review_score
+        description: "User rating (1–5)."
+      - name: thumbs_up_count
+        description: "Number of helpful votes on the review."
+      - name: user_name
+        description: "Reviewer display name."
+      - name: review_text
+        description: "Full text of the review."
