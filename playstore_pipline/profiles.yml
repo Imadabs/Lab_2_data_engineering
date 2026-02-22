@@ -1,0 +1,8 @@
+playstore_pipeline:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: data/db/playstore.db
+      threads: 4
+      external_root: "."
