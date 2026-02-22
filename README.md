@@ -1,69 +1,71 @@
+# Google Play Store Data Pipeline Documentation
+
+This document explains the end-to-end flow of the data pipeline, from raw data scraping to the final export for visualization.
+
+## Project Structure Overview
+
+The project is structured into three main phases: Ingestion, Transformation (dbt), and Export.
+
 ```text
-Playstore Data Pipeline (Lab 2)
-Ce projet implémente un pipeline de données complet pour collecter, transformer et exporter des données provenant du Google Play Store. Le projet utilise Python pour l'ingestion et l'exportation, SQLite comme base de données locale, et dbt pour la transformation des données.
+c:\Users\bellm\Desktop\lab 2\
+│
+├── ingest.py                           # 1. Data Ingestion script
+├── export_to_powerbi.py                # 3. Data Export script
+├── requirements.txt                    # Python dependencies
+├── dbt_run_output.txt                  # Logs for the dbt run execution
+│
+├── playstore_pipeline/                 # 2. dbt Project (Data Transformation)
+│   ├── dbt_project.yml                 # dbt configuration
+│   ├── profiles.yml                    # DuckDB connection profile
+│   ├── data/                           
+│   │   ├── raw/                        # Raw JSONL files from ingest.py
+│   │   └── db/                         # DuckDB database (playstore.db)
+│   ├── models/                         # SQL Transformation models
+│   │   ├── staging/                    # Base views over raw jsonl files
+│   │   └── marts/                      # Dimension and Fact tables
+│   │       ├── dimensions/             
+│   │       └── facts/                  
+│   └── ...                             # Other standard dbt folders (macros, tests, etc.)
+│
+└── powerbi_export/                     # Final output directory containing CSVs
+```
 
+## End-to-End Pipeline Flow
 
-📂 Structure du Projet
-Plaintext
+### 1. Data Ingestion (`ingest.py`)
+**Input:** A hardcoded list of popular Google Play Store App IDs.
+**Process:** 
+- The script uses the `google-play-scraper` Python package to fetch live data from the Google Play Store.
+- It scrapes **App Metadata** (title, developer, category, ratings, etc.).
+- It scrapes **User Reviews** (filtered to the last 100 days, up to a maximum of 5,000 reviews per app).
+**Output:** The script saves the scraped data into two JSONL (JSON Lines) files in the `playstore_pipeline\data\raw\` directory:
+- `apps.jsonl`
+- `reviews.jsonl`
 
-lab 2/
-├── ingest.py                 # Script d'ingestion des données brutes (JSONL -> DB)
-├── export_to_powerbi.py      # Script d'exportation des données transformées
-├── playstore_pipeline/       # Projet d'analyse de données (dbt)
-│   ├── dbt_project.yml       # Configuration du projet dbt
-│   ├── models/               # Modèles SQL (Marts, Dimensions, etc.)
-│   │   └── marts/
-│   │       └── dimensions/   # Modèles dim_categories, dim_date, etc.
-│   ├── seeds/                # Données statiques chargées via dbt
-│   ├── data/                 # Stockage des données
-│   │   ├── raw/              # Fichiers bruts (apps.jsonl, reviews.jsonl)
-│   │   └── db/               # Base de données SQLite (playstore.db)
-│   └── tests/                # Tests de qualité des données
-├── logs/                     # Journaux d'exécution de dbt
-└── dbt_run_output.txt        # Résultat de la dernière exécution dbt
-🚀 Fonctionnalités
+### 2. Data Transformation (`playstore_pipeline` using dbt & DuckDB)
+**Input:** The raw JSONL files (`apps.jsonl` and `reviews.jsonl`).
+**Process:** 
+- The project uses **dbt (data build tool)** backed by **DuckDB** as the analytical database engine.
+- DuckDB directly reads the JSONL files.
+- The dbt models inside `playstore_pipeline\models\` structure the data linearly:
+  - **Staging (`models/staging/`):** Cleans, casts, and renames columns from the raw unstructured JSON into tabular formats (`stg_playstore_apps.sql`, `stg_playstore_reviews.sql`).
+  - **Marts - Dimensions (`models/marts/dimensions/`):** Creates descriptive lookup tables for analysis (`dim_apps`, `dim_categories`, `dim_developers`, `dim_date`, `dim_apps_scd`).
+  - **Marts - Facts (`models/marts/facts/`):** Creates the central `fact_reviews` table storing the individual review transactions and associated scores.
+**Output:** Structured tables within the DuckDB database file located at `playstore_pipeline\data\db\playstore.db`.
 
-Ingestion : Le script ingest.py charge les fichiers JSONL bruts (apps.jsonl, reviews.jsonl) dans une base de données SQLite locale nommée playstore.db.
+### 3. Data Export (`export_to_powerbi.py`)
+**Input:** The mart-level tables inside the compiled DuckDB database (`playstore.db`).
+**Process:** 
+- The script connects to the DuckDB database.
+- It queries the dimension tables (`dim_apps`, `dim_categories`, `dim_developers`, `dim_date`, `dim_apps_scd`) and the fact table (`fact_reviews`).
+- It extracts the complete records from these analytical tables.
+**Output:** The tables are written out as individual `CSV` files in the `powerbi_export\` folder:
+- `powerbi_export\dim_apps.csv`
+- `powerbi_export\dim_categories.csv`
+- `powerbi_export\dim_developers.csv`
+- `powerbi_export\dim_date.csv`
+- `powerbi_export\dim_apps_scd.csv`
+- `powerbi_export\fact_reviews.csv`
 
-Transformation (dbt) : Utilisation de modèles SQL pour organiser les données en dimensions et faits :
-
-
-dim_categories : Organisation des applications par catégorie.
-
-
-dim_date : Table de temps pour les analyses chronologiques.
-
-
-dim_developers : Informations sur les développeurs d'applications.
-
-
-
-Qualité des données : Des tests unique et not_null sont configurés pour garantir l'intégrité des clés primaires (ex: category_sk, date_key, developer_id).
-
-
-Export : Le script export_to_powerbi.py permet de préparer les données pour une visualisation externe.
-
-🛠️ Installation et Utilisation
-Prérequis
-Python 3.x
-
-dbt (adaptateur SQLite)
-
-Étapes
-Ingestion des données :
-
-python ingest.py
-Exécution du pipeline dbt :
-Accédez au dossier du pipeline et exécutez les transformations :
-
-cd playstore_pipeline
-dbt run
-Vérification de la qualité :
-
-dbt test
-Exportation :
-
-
-python export_to_powerbi.py
-📊 Visualisation
-Une fois le pipeline exécuté, les modèles transformés dans playstore.db peuvent être connectés à Power BI ou tout autre outil de BI pour générer des rapports sur les performances des applications mobiles.
+---
+*Note: The final .csv files are then ready to be loaded into business intelligence tools for visualization.*
